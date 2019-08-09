@@ -1,15 +1,24 @@
-import React from "react"
+import React, { Fragment } from 'react'
+import PropTypes from 'prop-types'
 import { UserDataCard } from './UserDataCard'
 
-export const UserDataList = ({items}) => {
+const UserDataList = ({ users }) => {
+  return (
+    <Fragment>
+      {console.log('UserList: ', users)}
+      {users.map(user => (
+        <UserDataCard key={user.id} {...user} />
+      ))}
+    </Fragment>
+  )
+}
 
+UserDataList.propTypes = {
+  users: PropTypes.array,
+}
 
+UserDataList.defaultProps = {
+  users: [],
+}
 
-    return (
-        <div>
-            <UserDataCard {...items} />
-        </div>
-    )
-  };
-  
-
+export { UserDataList }

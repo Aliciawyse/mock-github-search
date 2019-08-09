@@ -1,5 +1,10 @@
-import React from "react"
+import React from 'react'
+import PropTypes from 'prop-types'
 
-export const UserDataCard = ({html_url}) => (
-    <div>{html_url}</div>  
-)
+const UserDataCard = ({ url }) => <div>{url}</div>
+
+UserDataCard.propTypes = {
+  url: PropTypes.string,
+}
+
+export { UserDataCard }
