@@ -19,6 +19,7 @@
     "react-dom": "^16.8.6"
   },
   "devDependencies": {
+    "gatsby-source-github-api": "^0.1.0",
     "prettier": "^1.18.2"
   },
   "repository": {

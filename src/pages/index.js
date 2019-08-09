@@ -1,72 +1,101 @@
-import React, {Component} from "react"
-import axios from "axios"
-import { UserDataList } from "../components/UserDataList";
+import React, { Component } from 'react'
+import axios from 'axios'
+import { UserDataList } from '../components/UserDataList'
 
 class FetchUsersExample extends Component {
+  state = {
+    error: '',
+    isLoading: false,
+    search_text: '',
+    users: [],
+  }
 
-    state = {
-        loading: false,
-        error: false,
-        search_text: ""
+  handleInputChange = event => {
+    const {
+      target: { value, name },
+    } = event
+
+    if (name) {
+      this.setState({
+        [name]: value,
+      })
     }
+  }
 
-    handleInputChange = event => {
-        const target = event.target
-        const value = target.value
-        const name = target.name
+  handleSubmit = async event => {
+    event.preventDefault()
+
+    const { search_text: user_input } = this.state
+
+    try {
+      const results = await axios.get(
+        `https://api.github.com/search/users?q=${user_input}`
+      )
+
+      // console.log("check",results.data.items)
+      // const my_data = JSON.stringify(results.data.items)
+
+      if (!results) {
+        this.setState({ isLoading: false, error: '' })
+      }
+
+      const {
+        data: { items },
+      } = results
+      console.log('Users: ', items)
+
+      if (items && items.length) {
         this.setState({
-            [name]: value,
+          users: items,
+          isLoading: false,
+          error: '',
         })
+      } else {
+        this.setState({ isLoading: false, error: '' })
+        console.log('no data')
+      }
+    } catch (error) {
+      this.setState({
+        isLoading: false,
+        error: error.message,
+      })
     }
+  }
 
-    handleSubmit = event => {
-        event.preventDefault()
-        
-        const user_input = this.state.search_text
+  render() {
+    const { error, isLoading, users, search_text } = this.state
 
-        axios.get(`https://api.github.com/search/users?q=${user_input}`)
-            .then(results => {
-            // console.log("check",results.data.items)
-            // const my_data = JSON.stringify(results.data.items)
-            const {items} = results.data
-            if(items && items.length){
-                this.setState({users: items})
-                console.log("users", users)
-            } else {
-                console.log("no data")
-            }
+    return (
+      <div>
+        <form onSubmit={this.handleSubmit}>
+          <label>
+            Search GitHub users
+            <input
+              type="text"
+              name="search_text"
+              value={search_text}
+              onChange={this.handleInputChange}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
 
-        })
-    }
+        <h1>Github api loads at run time</h1>
 
-    render () {
-        return (
-            <div>
-                <form onSubmit={this.handleSubmit}>
-                    <label>
-                        Search GitHub users
-                        <input
-                        type="text"
-                        name="search_text"
-                        value={this.state.search_text}
-                        onChange={this.handleInputChange}
-                        />
-                    </label>
-                    <button type="submit">Submit</button>
-                </form>
+        {error && <p>Error: {error}</p>}
 
-                <h1>Github api loads at run time</h1>
-                
-                {/* {console.log("yo",this.state.my_data)} */}
-                <UserDataList items={this.state.users} />
-                
-    
-                {/* <div>
-                    { this.state.my_data ? <p>{this.state.my_data}</p>: <p>please enter text</p> }
-                </div> */}
-            </div>
-        )
-    }
+        {/* {console.log("yo",this.state.my_data)} */}
+        {isLoading && <p>Loading...</p>}
+        {!isLoading && users && users.length > 0 && (
+          <UserDataList users={users} />
+        )}
+
+        {/* <div>
+              { this.state.my_data ? <p>{this.state.my_data}</p>: <p>please enter text</p> }
+          </div> */}
+      </div>
+    )
+  }
 }
 
 export default FetchUsersExample
